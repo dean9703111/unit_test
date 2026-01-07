@@ -193,3 +193,80 @@ Delay 選項：0ms / 1500ms / 3000ms
 - **Mocking**: MSW v2
 - **Testing**: Vitest + React Testing Library
 - **State**: React Context (簡單狀態管理)
+
+---
+
+## CI/CD - GitHub Actions
+
+專案包含自動化 CI/CD 流程，位於 `.github/workflows/deploy.yml`。
+
+### 流程
+
+```
+PR / Push
+    ↓
+┌─────────┐     ┌─────────┐     ┌─────────┐
+│  Test   │ ──► │  Build  │ ──► │ Deploy  │
+└─────────┘     └─────────┘     └─────────┘
+                                (僅 main/master)
+```
+
+### 觸發條件
+
+| 事件 | 分支 | 執行內容 |
+|-----|------|---------|
+| Push | main, master | Test → Build → Deploy |
+| Pull Request | 所有分支 | Test → Build |
+
+### GitHub Pages 部署
+
+1. 進入 repo **Settings** → **Pages**
+2. **Source** 選擇 **GitHub Actions**
+3. Push 到 main/master 後會自動部署
+
+### 自訂 Base Path
+
+如果 repo 名稱不是 `unit_test`，請修改 `vite.config.ts`：
+
+```typescript
+base: process.env.GITHUB_ACTIONS ? '/你的repo名稱/' : '/',
+```
+
+---
+
+## Branch Protection（Rulesets）
+
+設定測試失敗時禁止 Merge：
+
+### 設定步驟
+
+1. 進入 repo **Settings** → **Rules** → **Rulesets**
+2. 點擊 **New ruleset** → **New branch ruleset**
+
+### 設定內容
+
+| 欄位 | 值 |
+|-----|-----|
+| Ruleset Name | `Protect main branch` |
+| Enforcement status | `Active` |
+| Target branches | 點 Add target → Include by pattern → `main` |
+
+### 勾選規則
+
+- ✅ **Require a pull request before merging**
+- ✅ **Require status checks to pass**
+  - 點 **Add checks** → 搜尋 `test` → 選擇 `Run Tests`
+- ✅ **Require branches to be up to date before merging**（可選）
+
+### 儲存
+
+點 **Create** 建立規則
+
+### 效果
+
+| 測試結果 | Merge 按鈕 |
+|---------|-----------|
+| ❌ 失敗 | 🔒 鎖住 |
+| ✅ 通過 | 🔓 可合併 |
+
+> **注意**：第一次設定時可能搜不到 check，需要先開一個 PR 讓 workflow 跑過一次。
