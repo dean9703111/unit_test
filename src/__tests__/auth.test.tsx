@@ -54,8 +54,8 @@ beforeEach(() => {
 })
 
 describe('Authentication Flow', () => {
-    // Test 1: Login success → redirect to /dashboard → shows Welcome
-    it('should login successfully and redirect to dashboard with welcome message', async () => {
+    // Test 1: 登入成功後導向 Dashboard 並顯示歡迎訊息
+    it('1. 登入成功後導向 Dashboard 並顯示歡迎訊息', async () => {
         const user = userEvent.setup()
 
         renderWithRouter(<></>, { route: '/login' })
@@ -73,8 +73,8 @@ describe('Authentication Flow', () => {
         })
     })
 
-    // Test 2: Login failure (401) → stays on /login → shows error → token doesn't exist
-    it('should show error message on login failure and not set token', async () => {
+    // Test 2: 登入失敗時顯示錯誤訊息且不儲存 Token
+    it('2. 登入失敗時顯示錯誤訊息且不儲存 Token', async () => {
         const user = userEvent.setup()
 
         // Override handler to return 401
@@ -104,8 +104,8 @@ describe('Authentication Flow', () => {
         expect(localStorage.getItem('auth_token')).toBeNull()
     })
 
-    // Test 3: Unauthenticated access to /dashboard → redirect to /login
-    it('should redirect to login when accessing dashboard without authentication', async () => {
+    // Test 3: 未認證訪問受保護頁面時導向登入頁
+    it('3. 未認證訪問受保護頁面時導向登入頁', async () => {
         renderWithRouter(<></>, { route: '/dashboard' })
 
         // Should see login page
@@ -114,8 +114,8 @@ describe('Authentication Flow', () => {
         })
     })
 
-    // Test 4: Token expired on /api/me → clear token → redirect with "session expired"
-    it('should clear token and show session expired when token is expired', async () => {
+    // Test 4: Token 過期時清除 Token 並顯示 Session 過期提示
+    it('4. Token 過期時清除 Token 並顯示 Session 過期提示', async () => {
         // Set a token first
         localStorage.setItem('auth_token', 'fake.jwt.token.admin')
         localStorage.setItem(
@@ -141,8 +141,8 @@ describe('Authentication Flow', () => {
         expect(localStorage.getItem('auth_token')).toBeNull()
     })
 
-    // Test 5: role=user accessing /admin → shows 403/Forbidden
-    it('should show 403 page when user role tries to access admin page', async () => {
+    // Test 5: 一般使用者訪問 Admin 頁面時顯示 403 Forbidden
+    it('5. 一般使用者訪問 Admin 頁面時顯示 403 Forbidden', async () => {
         // Login as user (not admin)
         localStorage.setItem('auth_token', 'fake.jwt.token.user')
         localStorage.setItem(
@@ -160,8 +160,8 @@ describe('Authentication Flow', () => {
         })
     })
 
-    // Test 6: role=admin accessing /admin → shows admin content + secret
-    it('should show admin content when admin role accesses admin page', async () => {
+    // Test 6: Admin 使用者可正常訪問 Admin 頁面
+    it('6. Admin 使用者可正常訪問 Admin 頁面', async () => {
         // Login as admin
         localStorage.setItem('auth_token', 'fake.jwt.token.admin')
         localStorage.setItem(
@@ -180,8 +180,8 @@ describe('Authentication Flow', () => {
         })
     })
 
-    // Test 7: delay=3000ms → shows loading first, then data
-    it('should show loading state during delay then display data', async () => {
+    // Test 7: API 延遲時先顯示 Loading 狀態再顯示資料
+    it('7. API 延遲時先顯示 Loading 狀態再顯示資料', async () => {
         // Login as admin
         localStorage.setItem('auth_token', 'fake.jwt.token.admin')
         localStorage.setItem(
@@ -213,8 +213,8 @@ describe('Authentication Flow', () => {
         )
     })
 
-    // Test 8: server_error(500) → shows error + Retry → first 500, second success
-    it('should show error on 500 and succeed on retry', async () => {
+    // Test 8: 伺服器錯誤時顯示錯誤訊息，Retry 後成功
+    it('8. 伺服器錯誤時顯示錯誤訊息，Retry 後成功', async () => {
         const user = userEvent.setup()
         let callCount = 0
 
